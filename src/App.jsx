@@ -8,7 +8,8 @@ import PharmacyDirectory from './components/PharmacyDirectory'
 import HistoryPanel from './components/HistoryPanel'
 import StatsPanel from './components/StatsPanel'
 
-const API_URL = 'http://127.0.0.1:8000'
+// Configuration centralisée
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 // Intervalle de rafraîchissement automatique (5 secondes)
 const REFRESH_INTERVAL = 5000
@@ -164,8 +165,10 @@ export default function App() {
   useEffect(() => {
     if (!isAuthenticated) return
 
-    // Connexion au WebSocket global
-    const ws = new WebSocket(`ws://127.0.0.1:8000/queue/ws/dashboard`)
+    // Connexion au WebSocket global (dériver ws:// ou wss:// depuis API_URL)
+    const wsProtocol = API_URL.startsWith('https') ? 'wss' : 'ws';
+    const wsHost = API_URL.replace(/^https?:\/\//, '');
+    const ws = new WebSocket(`${wsProtocol}://${wsHost}/queue/ws/dashboard`)
     
     ws.onmessage = (event) => {
       try {

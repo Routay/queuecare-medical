@@ -3,7 +3,7 @@ import { Clock, Search, Filter, UserCheck, Calendar, ChevronDown, RefreshCw, Dow
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 
-const API_URL = 'http://127.0.0.1:8000'
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 export default function HistoryPanel() {
   const [history, setHistory] = useState([])
