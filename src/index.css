@@ -70,6 +70,63 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   line-height: 1.6;
+  position: relative;
+}
+
+/* ═══════════════════════════════════════
+   Animated Premium Background (Orbs)
+   ═══════════════════════════════════════ */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  width: 50vw;
+  height: 50vw;
+  max-width: 600px;
+  max-height: 600px;
+  border-radius: 50%;
+  z-index: -1;
+  filter: blur(120px);
+  opacity: 0.15;
+  animation: orb-float 20s infinite ease-in-out alternate;
+  pointer-events: none;
+}
+
+body::before {
+  background: hsl(var(--color-primary));
+  top: -10%;
+  left: -10%;
+}
+
+body::after {
+  background: hsl(var(--color-purple));
+  bottom: -10%;
+  right: -10%;
+  animation-delay: -10s;
+}
+
+@keyframes orb-float {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(5%, 5%) scale(1.1); }
+  100% { transform: translate(-5%, 10%) scale(0.9); }
+}
+
+/* ═══════════════════════════════════════
+   Custom Scrollbar
+   ═══════════════════════════════════════ */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--bg-primary));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border-glass));
+  border-radius: 5px;
+  border: 2px solid hsl(var(--bg-primary));
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--text-muted));
 }
 
 #root {
@@ -82,11 +139,18 @@ body {
    ═══════════════════════════════════════ */
 
 .glass-panel {
-  background: hsl(var(--bg-glass) / 0.6);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: hsl(var(--bg-glass) / 0.65);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
   border: 1px solid hsl(var(--border-glass) / 0.5);
   border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px hsla(0, 0%, 0%, 0.2);
+  transition: all var(--transition-base);
+}
+
+.glass-panel:hover {
+  border-color: hsl(var(--border-glass) / 0.8);
+  box-shadow: 0 8px 32px hsla(0, 0%, 0%, 0.3), 0 0 16px var(--glow-primary);
 }
 
 .glass-panel-solid {
