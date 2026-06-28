@@ -7,6 +7,7 @@ import PatientQueue from './components/PatientQueue'
 import PharmacyDirectory from './components/PharmacyDirectory'
 import HistoryPanel from './components/HistoryPanel'
 import StatsPanel from './components/StatsPanel'
+import ConsultationModal from './components/ConsultationModal'
 
 // Configuration centralisée
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
@@ -32,6 +33,7 @@ export default function App() {
   const [isCalling, setIsCalling] = useState(false)
   const [error, setError] = useState(null)
   const [toast, setToast] = useState(null)
+  const [activeConsultation, setActiveConsultation] = useState(null)
 
   // ═══════════════════════════════
   //  Auth handlers
@@ -129,6 +131,7 @@ export default function App() {
       
       if (data.status === 'called') {
         showToast(`Patient appelé avec succès ! (${data.remainingPatients} restant${data.remainingPatients > 1 ? 's' : ''})`)
+        setActiveConsultation(data.historyEntry)
       } else {
         showToast('Aucun patient en attente.')
       }
@@ -141,6 +144,31 @@ export default function App() {
       console.error('Call next error:', err)
     } finally {
       setIsCalling(false)
+    }
+  }
+
+  // ═══════════════════════════════
+  //  Complete Consultation
+  // ═══════════════════════════════
+  const handleCompleteConsultation = async (notes, medicines) => {
+    if (!activeConsultation) return;
+    try {
+      const res = await fetch(`${API_URL}/consultations/prescribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ticketId: activeConsultation.id,
+          doctorName: currentUser?.fullName || 'Médecin',
+          notes,
+          medicines
+        })
+      });
+      if (!res.ok) throw new Error('Erreur lors de la création de l\'ordonnance');
+      
+      showToast('Consultation terminée et ordonnance envoyée !');
+      setActiveConsultation(null);
+    } catch (err) {
+      setError(err.message);
     }
   }
 
@@ -300,6 +328,15 @@ export default function App() {
           <CheckCircle size={18} />
           {toast}
         </div>
+      )}
+
+      {/* Consultation Modal */}
+      {activeConsultation && (
+        <ConsultationModal 
+          patient={activeConsultation}
+          onClose={() => setActiveConsultation(null)}
+          onComplete={handleCompleteConsultation}
+        />
       )}
     </>
   )
