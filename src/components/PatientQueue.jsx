@@ -42,6 +42,9 @@ export default function PatientQueue({ patients, department, onCallNext, isCalli
             <div className="patient-position">
               {index + 1}
             </div>
+            <div className="patient-avatar">
+              <UserCheck size={16} />
+            </div>
             <div className="patient-info">
               <div className="patient-ticket">{patient.ticketNumber}</div>
               <div className="patient-meta">

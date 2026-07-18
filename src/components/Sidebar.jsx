@@ -28,22 +28,26 @@ export default function Sidebar({ activeTab, onTabChange, user, onLogout }) {
           <Pill size={18} />
           <span>Pharmacies</span>
         </button>
-        <button
-          id="nav-appointments"
-          className={`nav-item ${activeTab === 'appointments' ? 'active' : ''}`}
-          onClick={() => onTabChange('appointments')}
-        >
-          <CalendarDays size={18} />
-          <span>Rendez-vous</span>
-        </button>
-        <button
-          id="nav-history"
-          className={`nav-item ${activeTab === 'history' ? 'active' : ''}`}
-          onClick={() => onTabChange('history')}
-        >
-          <Clock size={18} />
-          <span>Historique</span>
-        </button>
+        {user?.role !== 'Agent Médical' && (
+          <>
+            <button
+              id="nav-appointments"
+              className={`nav-item ${activeTab === 'appointments' ? 'active' : ''}`}
+              onClick={() => onTabChange('appointments')}
+            >
+              <CalendarDays size={18} />
+              <span>Rendez-vous</span>
+            </button>
+            <button
+              id="nav-history"
+              className={`nav-item ${activeTab === 'history' ? 'active' : ''}`}
+              onClick={() => onTabChange('history')}
+            >
+              <Clock size={18} />
+              <span>Historique</span>
+            </button>
+          </>
+        )}
         <button
           id="nav-stats"
           className={`nav-item ${activeTab === 'stats' ? 'active' : ''}`}

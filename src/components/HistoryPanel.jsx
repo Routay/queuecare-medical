@@ -5,7 +5,7 @@ import 'jspdf-autotable'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
-export default function HistoryPanel() {
+export default function HistoryPanel({ user }) {
   const [history, setHistory] = useState([])
   const [filteredHistory, setFilteredHistory] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -15,8 +15,9 @@ export default function HistoryPanel() {
 
   const fetchHistory = useCallback(async () => {
     try {
+      if (!user?.hospital_id) return;
       setIsLoading(true)
-      const res = await fetch(`${API_URL}/queue/history/all`)
+      const res = await fetch(`${API_URL}/queue/history/all/${user.hospital_id}`)
       if (!res.ok) throw new Error('Erreur serveur')
       const data = await res.json()
       setHistory(data)
@@ -29,7 +30,7 @@ export default function HistoryPanel() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [user])
 
   useEffect(() => {
     fetchHistory()

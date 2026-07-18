@@ -3,14 +3,15 @@ import { BarChart3, Users, Clock, TrendingUp, Activity, Zap, RefreshCw } from 'l
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
-export default function StatsPanel() {
+export default function StatsPanel({ user }) {
   const [stats, setStats] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchStats = useCallback(async () => {
     try {
+      if (!user?.hospital_id) return;
       setIsLoading(true)
-      const res = await fetch(`${API_URL}/queue/statistics/overview`)
+      const res = await fetch(`${API_URL}/queue/statistics/overview?hospital_id=${user.hospital_id}`)
       if (!res.ok) throw new Error('Erreur serveur')
       const data = await res.json()
       setStats(data)
@@ -19,7 +20,7 @@ export default function StatsPanel() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [user])
 
   useEffect(() => {
     fetchStats()

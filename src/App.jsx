@@ -63,31 +63,38 @@ export default function App() {
   //  Fetch departments
   // ═══════════════════════════════
   const fetchDepartments = useCallback(async () => {
+    if (!currentUser?.hospital_id) return
     try {
-      const res = await fetch(`${API_URL}/queue/departments/list`)
+      const res = await fetch(`${API_URL}/queue/${currentUser.hospital_id}/departments/list`)
       if (!res.ok) throw new Error('Erreur serveur')
       const data = await res.json()
-      setDepartments(data)
+      
+      // Filtrer pour les médecins : ils ne voient que leur département
+      const filtered = currentUser.role === 'Agent Médical' 
+        ? data 
+        : data.filter(d => d.name === currentUser.department);
+
+      setDepartments(filtered)
       
       // Sélectionner le premier département par défaut
-      if (!selectedDept && data.length > 0) {
-        setSelectedDept(data[0].name)
+      if (!selectedDept && filtered.length > 0) {
+        setSelectedDept(filtered[0].name)
       }
       setError(null)
     } catch (err) {
-      setError('Impossible de se connecter au serveur. Vérifiez que le backend est lancé sur le port 8000.')
+      setError('Impossible de se connecter au serveur.')
       console.error('Fetch departments error:', err)
     }
-  }, [selectedDept])
+  }, [selectedDept, currentUser])
 
   // ═══════════════════════════════
   //  Fetch queue for selected dept
   // ═══════════════════════════════
   const fetchQueue = useCallback(async (dept) => {
-    if (!dept) return
+    if (!dept || !currentUser?.hospital_id) return
     try {
       setIsLoadingQueue(true)
-      const res = await fetch(`${API_URL}/queue/${encodeURIComponent(dept)}`)
+      const res = await fetch(`${API_URL}/queue/${currentUser.hospital_id}/${encodeURIComponent(dept)}`)
       if (!res.ok) throw new Error('Erreur serveur')
       const data = await res.json()
       setPatients(data.patients || [])
@@ -96,7 +103,7 @@ export default function App() {
     } finally {
       setIsLoadingQueue(false)
     }
-  }, [])
+  }, [currentUser])
 
   // ═══════════════════════════════
   //  Fetch pharmacies
@@ -119,13 +126,17 @@ export default function App() {
   //  Call next patient
   // ═══════════════════════════════
   const handleCallNext = async () => {
-    if (!selectedDept || isCalling) return
+    if (!selectedDept || isCalling || !currentUser?.hospital_id) return
     setIsCalling(true)
     try {
       const doctorName = currentUser?.fullName || 'Médecin'
       const res = await fetch(
-        `${API_URL}/queue/${encodeURIComponent(selectedDept)}/next?doctorName=${encodeURIComponent(doctorName)}`,
-        { method: 'POST' }
+        `${API_URL}/queue/${currentUser.hospital_id}/${encodeURIComponent(selectedDept)}/next`,
+        { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ doctorName, hospital_id: currentUser.hospital_id })
+        }
       )
       if (!res.ok) throw new Error('Erreur serveur')
       const data = await res.json()
@@ -267,43 +278,47 @@ export default function App() {
         )}
 
         {activeTab === 'queue' && (
-          <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
-            <div className="page-header">
-              <h2>Gestion des Files d'Attente</h2>
-              <p>Visualisez et gérez les patients en attente dans chaque service.</p>
-            </div>
-
-            <StatCards departments={departments} />
-
-            {/* Department tabs */}
-            <div className="department-tabs" id="dept-tabs">
-              {departments.map((dept) => (
-                <button
-                  key={dept.name}
-                  className={`dept-tab ${selectedDept === dept.name ? 'active' : ''}`}
-                  onClick={() => setSelectedDept(dept.name)}
-                  id={`dept-tab-${dept.name.replace(/\s+/g, '-')}`}
-                >
-                  {dept.name}
-                  <span className="badge">{dept.waitingCount}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Patient queue */}
-            {isLoadingQueue && patients.length === 0 ? (
-              <div className="loading-container">
-                <div className="spinner"></div>
-                <span>Chargement de la file...</span>
+          <div className="dashboard-layout" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+            <div className="main-column">
+              <div className="page-header">
+                <h2>Gestion des Files d'Attente</h2>
+                <p>Visualisez et gérez les patients en attente dans chaque service.</p>
               </div>
-            ) : (
-              <PatientQueue
-                patients={patients}
-                department={selectedDept || '—'}
-                onCallNext={handleCallNext}
-                isCalling={isCalling}
-              />
-            )}
+
+              {/* Department tabs */}
+              <div className="department-tabs" id="dept-tabs">
+                {departments.map((dept) => (
+                  <button
+                    key={dept.name}
+                    className={`dept-tab ${selectedDept === dept.name ? 'active' : ''}`}
+                    onClick={() => setSelectedDept(dept.name)}
+                    id={`dept-tab-${dept.name.replace(/\s+/g, '-')}`}
+                  >
+                    {dept.name}
+                    <span className="badge">{dept.waitingCount}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Patient queue */}
+              {isLoadingQueue && patients.length === 0 ? (
+                <div className="loading-container">
+                  <div className="spinner"></div>
+                  <span>Chargement de la file...</span>
+                </div>
+              ) : (
+                <PatientQueue
+                  patients={patients}
+                  department={selectedDept || '—'}
+                  onCallNext={handleCallNext}
+                  isCalling={isCalling}
+                />
+              )}
+            </div>
+
+            <div className="side-column">
+              <StatCards departments={departments} />
+            </div>
           </div>
         )}
 
@@ -322,9 +337,9 @@ export default function App() {
           <AppointmentsPanel user={currentUser} showToast={showToast} setError={setError} />
         )}
 
-        {activeTab === 'history' && <HistoryPanel />}
+        {activeTab === 'history' && <HistoryPanel user={currentUser} />}
 
-        {activeTab === 'stats' && <StatsPanel />}
+        {activeTab === 'stats' && <StatsPanel user={currentUser} />}
       </main>
 
       {/* Success Toast */}
