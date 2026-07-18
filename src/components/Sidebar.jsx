@@ -1,4 +1,4 @@
-import { Stethoscope, LayoutDashboard, Pill, Clock, BarChart3, LogOut, User } from 'lucide-react'
+import { Stethoscope, LayoutDashboard, Pill, Clock, BarChart3, LogOut, User, CalendarDays } from 'lucide-react'
 
 export default function Sidebar({ activeTab, onTabChange, user, onLogout }) {
   return (
@@ -27,6 +27,14 @@ export default function Sidebar({ activeTab, onTabChange, user, onLogout }) {
         >
           <Pill size={18} />
           <span>Pharmacies</span>
+        </button>
+        <button
+          id="nav-appointments"
+          className={`nav-item ${activeTab === 'appointments' ? 'active' : ''}`}
+          onClick={() => onTabChange('appointments')}
+        >
+          <CalendarDays size={18} />
+          <span>Rendez-vous</span>
         </button>
         <button
           id="nav-history"

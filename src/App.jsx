@@ -8,6 +8,7 @@ import PharmacyDirectory from './components/PharmacyDirectory'
 import HistoryPanel from './components/HistoryPanel'
 import StatsPanel from './components/StatsPanel'
 import ConsultationModal from './components/ConsultationModal'
+import AppointmentsPanel from './components/AppointmentsPanel'
 
 // Configuration centralisée
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
@@ -315,6 +316,10 @@ export default function App() {
 
             <PharmacyDirectory pharmacies={pharmacies} isLoading={isLoadingPharmacies} />
           </div>
+        )}
+
+        {activeTab === 'appointments' && (
+          <AppointmentsPanel user={currentUser} showToast={showToast} setError={setError} />
         )}
 
         {activeTab === 'history' && <HistoryPanel />}
