@@ -9,6 +9,7 @@ import HistoryPanel from './components/HistoryPanel'
 import StatsPanel from './components/StatsPanel'
 import ConsultationModal from './components/ConsultationModal'
 import AppointmentsPanel from './components/AppointmentsPanel'
+import HospitalsPanel from './components/HospitalsPanel'
 
 // Configuration centralisée
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
@@ -340,6 +341,8 @@ export default function App() {
         {activeTab === 'history' && <HistoryPanel user={currentUser} />}
 
         {activeTab === 'stats' && <StatsPanel user={currentUser} />}
+
+        {activeTab === 'hospitals' && <HospitalsPanel />}
       </main>
 
       {/* Success Toast */}

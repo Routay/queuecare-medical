@@ -1847,3 +1847,108 @@ body::after {
     justify-content: center;
   }
 }
+
+/* ═══════════════════════════════════════
+   Hospitals Panel
+   ═══════════════════════════════════════ */
+.hospitals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.hospital-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hospital-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.hospital-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hospital-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--color-purple);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hospital-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: hsl(var(--text-primary));
+  margin-bottom: 4px;
+}
+
+.hospital-address {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: hsl(var(--text-muted));
+}
+
+.hospital-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid hsl(var(--border-color));
+}
+
+.h-stat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.h-stat-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.h-stat-icon.purple { background: rgba(139, 92, 246, 0.15); color: var(--color-purple); }
+.h-stat-icon.accent { background: rgba(236, 72, 153, 0.15); color: var(--color-accent); }
+.h-stat-icon.warning { background: rgba(245, 158, 11, 0.15); color: var(--color-warning); }
+
+.h-stat-val {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: hsl(var(--text-primary));
+}
+
+.h-stat-label {
+  font-size: 0.75rem;
+  color: hsl(var(--text-muted));
+}
+
+.hospital-stats-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 0;
+  color: hsl(var(--text-muted));
+  font-size: 0.9rem;
+  border-top: 1px solid hsl(var(--border-color));
+}
+

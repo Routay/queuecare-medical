@@ -5,12 +5,21 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 export default function StatsPanel({ user }) {
   const [stats, setStats] = useState(null)
+  const [hospitalName, setHospitalName] = useState('')
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchStats = useCallback(async () => {
     try {
       if (!user?.hospital_id) return;
       setIsLoading(true)
+      
+      // Fetch Hospital details for the title
+      const hospRes = await fetch(`${API_URL}/hospitals/${user.hospital_id}`)
+      if (hospRes.ok) {
+        const hospData = await hospRes.json()
+        setHospitalName(hospData.data.name)
+      }
+
       const res = await fetch(`${API_URL}/queue/statistics/overview?hospital_id=${user.hospital_id}`)
       if (!res.ok) throw new Error('Erreur serveur')
       const data = await res.json()
@@ -32,7 +41,7 @@ export default function StatsPanel({ user }) {
     return (
       <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
         <div className="page-header">
-          <h2>Statistiques en Temps Réel</h2>
+          <h2>Statistiques de l'Hôpital</h2>
           <p>Analyse des performances de l'écosystème QueueCare.</p>
         </div>
         <div className="loading-container">
@@ -52,8 +61,8 @@ export default function StatsPanel({ user }) {
     <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h2>Statistiques en Temps Réel</h2>
-          <p>Analyse des performances de l'écosystème QueueCare.</p>
+          <h2>Statistiques : {hospitalName || 'Hôpital'}</h2>
+          <p>Analyse des performances de votre établissement.</p>
         </div>
         <button className="refresh-btn" onClick={fetchStats} id="stats-refresh">
           <RefreshCw size={16} />
