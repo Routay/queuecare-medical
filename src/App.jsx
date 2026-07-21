@@ -38,6 +38,7 @@ export default function App() {
   const [toast, setToast] = useState(null)
   const [activeConsultation, setActiveConsultation] = useState(null)
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   // ═══════════════════════════════
   //  Auth handlers
@@ -64,9 +65,12 @@ export default function App() {
     }, 4000)
   }
 
-  const handleLogout = async () => {
+  const requestLogout = () => setShowLogoutConfirm(true)
+  
+  const confirmLogout = () => {
+    setShowLogoutConfirm(false)
     try {
-      await fetch(`${API_URL}/auth/logout?token=${authToken}`, { method: 'POST' })
+      fetch(`${API_URL}/auth/logout?token=${authToken}`, { method: 'POST' })
     } catch (err) {
       console.error('Logout error:', err)
     }
@@ -98,6 +102,8 @@ export default function App() {
       // Sélectionner le premier département par défaut
       if (!selectedDept && filtered.length > 0) {
         setSelectedDept(filtered[0].name)
+      } else if (filtered.length === 0) {
+        setIsLoadingQueue(false)
       }
       setError(null)
     } catch (err) {
@@ -286,7 +292,7 @@ export default function App() {
           onTabChange={setActiveTab}
           user={currentUser}
           hospitalName={hospitalName}
-          onLogout={handleLogout}
+          onLogout={requestLogout}
         />
 
       <main className="main-content">
@@ -345,7 +351,7 @@ export default function App() {
               </div>
 
               {/* Patient queue */}
-              {isLoadingQueue && patients.length === 0 ? (
+              {isLoadingQueue && patients.length === 0 && departments.length > 0 ? (
                 <div className="loading-container">
                   <div className="spinner"></div>
                   <span>Chargement de la file...</span>
@@ -353,7 +359,7 @@ export default function App() {
               ) : (
                 <PatientQueue
                   patients={patients}
-                  department={selectedDept || '—'}
+                  department={selectedDept || "Aucun"}
                   onCallNext={handleCallNext}
                   isCalling={isCalling}
                 />
@@ -392,9 +398,34 @@ export default function App() {
         )}
       </main>
 
+      {/* Modals Globaux */}
+      {showLogoutConfirm && (
+        <div className="modal-overlay" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="modal-content glass-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', textAlign: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <LogOut size={28} color="#ef4444" />
+              </div>
+            </div>
+            <h3 style={{ marginBottom: '12px', fontSize: '1.25rem' }}>Déconnexion</h3>
+            <p style={{ color: 'hsl(var(--text-muted))', marginBottom: '24px', lineHeight: 1.5 }}>
+              Êtes-vous sûr de vouloir vous déconnecter de votre session ?
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button className="btn btn-secondary" onClick={() => setShowLogoutConfirm(false)} style={{ flex: 1 }}>
+                Annuler
+              </button>
+              <button className="btn btn-danger" onClick={confirmLogout} style={{ flex: 1 }}>
+                Oui, me déconnecter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Success Toast */}
       {toast && (
-        <div className="success-toast" id="toast-notification">
+        <div className="toast" id="global-toast">
           <CheckCircle size={18} />
           {toast}
         </div>

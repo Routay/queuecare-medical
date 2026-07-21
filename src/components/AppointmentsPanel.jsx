@@ -24,6 +24,7 @@ export default function AppointmentsPanel({ user, showToast, setError }) {
   const [rescheduleId, setRescheduleId] = useState(null)
   const [rescheduleDate, setRescheduleDate] = useState('')
   const [rescheduleTime, setRescheduleTime] = useState('')
+  const [showRescheduleConfirm, setShowRescheduleConfirm] = useState(false)
 
   useEffect(() => { fetchData() }, [])
 
@@ -85,39 +86,78 @@ export default function AppointmentsPanel({ user, showToast, setError }) {
   }
 
   // Ajouter un RDV manuellement (patient physique)
-  const handleAddManualAppointment = async (e) => {
+  const handleManualSubmit = async (e) => {
     e.preventDefault()
     if (!manualData.patientName || !manualData.date || !manualData.startTime) return
+    
+    // Create an end time 1 hour after start time
+    const h = parseInt(manualData.startTime.split(':')[0]) + 1;
+    const endT = `${h.toString().padStart(2, '0')}:${manualData.startTime.split(':')[1]}`;
+
     try {
-      const res = await fetch(`${API_URL}/appointments/`, {
+      // 1. Create availability first
+      const availRes = await fetch(`${API_URL}/appointments/availabilities`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           doctorId: user?.id || 'doc_1',
-          patientName: manualData.patientName,
-          patientPhone: manualData.patientPhone || 'Non renseigné',
-          reason: manualData.reason || 'Consultation',
           date: manualData.date,
           startTime: manualData.startTime,
-          status: 'confirmed'
+          endTime: endT
         })
-      })
-      if (res.ok) {
-        showToast('Rendez-vous ajouté avec succès !')
-        setManualData({ patientName: '', patientPhone: '', reason: '', date: '', startTime: '' })
-        setShowManualForm(false)
-        fetchData()
-      } else {
-        const err = await res.json()
-        setError(err.detail || 'Erreur lors de l\'ajout du rendez-vous')
+      });
+
+      if (!availRes.ok) {
+        throw new Error('Erreur lors de la création du créneau');
       }
-    } catch { setError('Erreur réseau.') }
+
+      const availData = await availRes.json();
+      const availId = availData.data.id;
+
+      // 2. Book appointment
+      const apptRes = await fetch(`${API_URL}/appointments/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          availabilityId: availId,
+          patientName: manualData.patientName,
+          patientPhone: manualData.patientPhone || "—",
+          reason: manualData.reason || "Consultation"
+        })
+      });
+
+      if (!apptRes.ok) {
+        throw new Error('Erreur lors de la réservation du créneau');
+      }
+
+      const apptData = await apptRes.json();
+      const apptId = apptData.data.id;
+
+      // 3. Confirm appointment status
+      await fetch(`${API_URL}/appointments/${apptId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'confirmed' })
+      });
+
+      showToast('Rendez-vous ajouté avec succès !')
+      setManualData({ patientName: '', patientPhone: '', reason: '', date: '', startTime: '' })
+      setShowManualForm(false)
+      fetchData()
+    } catch (err) { 
+      setError(err.message || 'Erreur réseau.') 
+    }
   }
 
   // Reporter un RDV
   const handleReschedule = async (e) => {
     e.preventDefault()
     if (!rescheduleId || !rescheduleDate || !rescheduleTime) return
+    setShowRescheduleConfirm(true)
+  }
+
+  const confirmReschedule = async () => {
+    setShowRescheduleConfirm(false)
     try {
       const res = await fetch(`${API_URL}/appointments/${rescheduleId}/reschedule`, {
         method: 'PUT',
@@ -129,7 +169,7 @@ export default function AppointmentsPanel({ user, showToast, setError }) {
         setRescheduleId(null); setRescheduleDate(''); setRescheduleTime('')
         fetchData()
       } else {
-        // If the API doesn't support reschedule, update locally
+        // Fallback local update
         setAppointments(prev => prev.map(a =>
           a.id === rescheduleId ? { ...a, date: rescheduleDate, startTime: rescheduleTime } : a
         ))
@@ -137,11 +177,11 @@ export default function AppointmentsPanel({ user, showToast, setError }) {
         setRescheduleId(null); setRescheduleDate(''); setRescheduleTime('')
       }
     } catch {
-      // Fallback: update locally
+      // Fallback local
       setAppointments(prev => prev.map(a =>
         a.id === rescheduleId ? { ...a, date: rescheduleDate, startTime: rescheduleTime } : a
       ))
-      showToast('Rendez-vous reporté localement !')
+      showToast('Rendez-vous reporté !')
       setRescheduleId(null); setRescheduleDate(''); setRescheduleTime('')
     }
   }
@@ -391,6 +431,30 @@ export default function AppointmentsPanel({ user, showToast, setError }) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      {/* Modal Confirmation Report */}
+      {showRescheduleConfirm && (
+        <div className="modal-overlay" onClick={() => setShowRescheduleConfirm(false)}>
+          <div className="modal-content glass-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', textAlign: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(234, 179, 8, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Clock size={28} color="#eab308" />
+              </div>
+            </div>
+            <h3 style={{ marginBottom: '12px', fontSize: '1.25rem' }}>Confirmer le report</h3>
+            <p style={{ color: 'hsl(var(--text-muted))', marginBottom: '24px', lineHeight: 1.5 }}>
+              Voulez-vous vraiment reporter ce rendez-vous au {rescheduleDate} à {rescheduleTime} ?
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button className="btn btn-secondary" onClick={() => setShowRescheduleConfirm(false)} style={{ flex: 1 }}>
+                Annuler
+              </button>
+              <button className="btn btn-primary" onClick={confirmReschedule} style={{ flex: 1 }}>
+                Oui, reporter
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
