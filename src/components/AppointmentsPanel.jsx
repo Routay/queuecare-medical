@@ -27,7 +27,7 @@ export default function AppointmentsPanel({ user, showToast, setError }) {
 
   useEffect(() => { fetchData() }, [])
 
-  const fetchData = async () => {
+  async function fetchData() {
     setIsLoading(true)
     try {
       const [availRes, apptRes] = await Promise.all([
@@ -159,10 +159,10 @@ export default function AppointmentsPanel({ user, showToast, setError }) {
     }))
     const appts = appointments.filter(a => a.date === date).map(a => ({
       type: 'appointment', id: a.id, startTime: a.startTime,
-      endTime: a.endTime || `${parseInt(a.startTime.split(':')[0])+1}:00`,
+      endTime: a.endTime || (a.startTime ? `${parseInt(a.startTime.split(':')[0])+1}:00` : ''),
       status: a.status, obj: a
     }))
-    const slots = [...freeAvails, ...appts].sort((a, b) => a.startTime.localeCompare(b.startTime))
+    const slots = [...freeAvails, ...appts].sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''))
     return { date, slots }
   })
 

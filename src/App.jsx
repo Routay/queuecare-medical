@@ -24,6 +24,7 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [authToken, setAuthToken] = useState(null)
   const [currentUser, setCurrentUser] = useState(null)
+  const [hospitalName, setHospitalName] = useState('Hôpital')
 
   const [activeTab, setActiveTab] = useState('queue')
   const [departments, setDepartments] = useState([])
@@ -41,14 +42,26 @@ export default function App() {
   // ═══════════════════════════════
   //  Auth handlers
   // ═══════════════════════════════
-  const handleLogin = (token, user) => {
+  const handleLogin = async (token, user) => {
     setAuthToken(token)
     setCurrentUser(user)
     setIsAuthenticated(true)
+    
+    try {
+      const res = await fetch(`${API_URL}/hospitals/`)
+      if (res.ok) {
+        const data = await res.json()
+        const h = data.find(h => h.id === user.hospital_id)
+        if (h) setHospitalName(h.name)
+      }
+    } catch (e) {
+      console.error('Failed to fetch hospitals', e)
+    }
+
     setShowWelcomeScreen(true)
     setTimeout(() => {
       setShowWelcomeScreen(false)
-    }, 2000)
+    }, 4000)
   }
 
   const handleLogout = async () => {
@@ -268,12 +281,13 @@ export default function App() {
   // ═══════════════════════════════
   return (
     <>
-      <Sidebar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        user={currentUser}
-        onLogout={handleLogout}
-      />
+        <Sidebar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          user={currentUser}
+          hospitalName={hospitalName}
+          onLogout={handleLogout}
+        />
 
       <main className="main-content">
         {/* Hospital & Department Header Bar */}
@@ -286,7 +300,7 @@ export default function App() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.9rem', color: 'hsl(var(--text-secondary))' }}>
             <span style={{ fontWeight: '600', color: 'hsl(var(--text-primary))' }}>
-              {currentUser?.hospital_id || 'Hôpital'}
+              {hospitalName || currentUser?.hospital_id}
             </span>
             {currentUser?.department && (
               <>
@@ -363,7 +377,7 @@ export default function App() {
           </div>
         )}
 
-        {activeTab === 'appointments' && (
+        {activeTab === 'appointments' && currentUser?.role !== 'Agent Médical' && (
           <AppointmentsPanel user={currentUser} showToast={showToast} setError={setError} />
         )}
 
@@ -400,7 +414,7 @@ export default function App() {
         <div className="welcome-overlay">
           <div className="welcome-content">
             <h1 className="welcome-title">Bienvenue, {currentUser?.fullName}</h1>
-            <p className="welcome-subtitle">{currentUser?.hospital_id || 'Hôpital'}</p>
+            <p className="welcome-subtitle">{hospitalName || currentUser?.hospital_id}</p>
             <div className="welcome-spinner"></div>
           </div>
         </div>

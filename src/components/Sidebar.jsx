@@ -1,6 +1,6 @@
 import { Stethoscope, LayoutDashboard, Pill, Clock, BarChart3, LogOut, CalendarDays, Settings, Users, Building2 } from 'lucide-react'
 
-export default function Sidebar({ activeTab, onTabChange, user, onLogout }) {
+export default function Sidebar({ activeTab, onTabChange, user, hospitalName, onLogout }) {
   return (
     <aside className="sidebar" id="sidebar">
       <div className="sidebar-logo">
@@ -98,7 +98,7 @@ export default function Sidebar({ activeTab, onTabChange, user, onLogout }) {
             display: 'flex', flexDirection: 'column', gap: '4px'
           }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Building2 size={12} /> {user.hospital_id || 'Hôpital'}
+              <Building2 size={12} /> {hospitalName || user.hospital_id || 'Hôpital'}
             </span>
             {user.department && (
               <span style={{ color: 'hsl(var(--color-primary))', fontWeight: '500' }}>
