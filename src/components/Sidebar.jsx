@@ -1,4 +1,4 @@
-import { Stethoscope, LayoutDashboard, Pill, Clock, BarChart3, LogOut, User, CalendarDays, Building2 } from 'lucide-react'
+import { Stethoscope, LayoutDashboard, Pill, Clock, BarChart3, LogOut, CalendarDays, Settings, Users, Building2 } from 'lucide-react'
 
 export default function Sidebar({ activeTab, onTabChange, user, onLogout }) {
   return (
@@ -48,6 +48,16 @@ export default function Sidebar({ activeTab, onTabChange, user, onLogout }) {
             </button>
           </>
         )}
+        {user?.role === 'Agent Médical' && (
+          <button
+            id="nav-doctors"
+            className={`nav-item ${activeTab === 'doctors' ? 'active' : ''}`}
+            onClick={() => onTabChange('doctors')}
+          >
+            <Users size={18} />
+            <span>Médecins</span>
+          </button>
+        )}
         <button
           id="nav-stats"
           className={`nav-item ${activeTab === 'stats' ? 'active' : ''}`}
@@ -56,7 +66,14 @@ export default function Sidebar({ activeTab, onTabChange, user, onLogout }) {
           <BarChart3 size={18} />
           <span>Statistiques</span>
         </button>
-
+        <button
+          id="nav-settings"
+          className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => onTabChange('settings')}
+        >
+          <Settings size={18} />
+          <span>Paramètres</span>
+        </button>
       </nav>
 
       <div className="sidebar-footer">
@@ -68,6 +85,26 @@ export default function Sidebar({ activeTab, onTabChange, user, onLogout }) {
               <span className="profile-name">{user.fullName}</span>
               <span className="profile-role">{user.role}</span>
             </div>
+          </div>
+        )}
+
+        {/* Hospital & Department badge */}
+        {user && (
+          <div style={{
+            padding: '10px 14px', margin: '8px 12px', borderRadius: '8px',
+            background: 'hsla(var(--color-primary)/0.08)',
+            border: '1px solid hsla(var(--color-primary)/0.15)',
+            fontSize: '0.78rem', color: 'hsl(var(--text-muted))',
+            display: 'flex', flexDirection: 'column', gap: '4px'
+          }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Building2 size={12} /> {user.hospital_id || 'Hôpital'}
+            </span>
+            {user.department && (
+              <span style={{ color: 'hsl(var(--color-primary))', fontWeight: '500' }}>
+                {user.department}
+              </span>
+            )}
           </div>
         )}
 

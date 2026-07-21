@@ -24,20 +24,13 @@ export default function StatsPanel({ user }) {
       if (!res.ok) throw new Error('Erreur serveur')
       const data = await res.json()
       
-      // Inject mock data if empty so the dashboard is not completely empty for the user
-      if (data.totalTicketsCreated === 0) {
-        data.totalTicketsCreated = 145;
-        data.totalPatientsTreated = 112;
-        data.totalWaiting = 33;
-        data.averageWaitMinutes = 18;
-        data.busiestDepartment = "Médecine Générale";
-        data.departmentStats = [
-          { name: "Médecine Générale", treated: 45, waiting: 15, total: 60 },
-          { name: "Pédiatrie", treated: 30, waiting: 10, total: 40 },
-          { name: "Cardiologie", treated: 20, waiting: 5, total: 25 },
-          { name: "Ophtalmologie", treated: 17, waiting: 3, total: 20 }
-        ];
-      }
+      // Ensure defaults so UI renders properly even when empty
+      if (!data.totalTicketsCreated && data.totalTicketsCreated !== 0) data.totalTicketsCreated = 0;
+      if (!data.totalPatientsTreated && data.totalPatientsTreated !== 0) data.totalPatientsTreated = 0;
+      if (!data.totalWaiting && data.totalWaiting !== 0) data.totalWaiting = 0;
+      if (!data.averageWaitMinutes && data.averageWaitMinutes !== 0) data.averageWaitMinutes = 0;
+      if (!data.busiestDepartment) data.busiestDepartment = 'Aucun';
+      if (!data.departmentStats) data.departmentStats = [];
 
       setStats(data)
     } catch (err) {

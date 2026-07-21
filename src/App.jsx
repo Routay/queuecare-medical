@@ -9,6 +9,8 @@ import HistoryPanel from './components/HistoryPanel'
 import StatsPanel from './components/StatsPanel'
 import ConsultationModal from './components/ConsultationModal'
 import AppointmentsPanel from './components/AppointmentsPanel'
+import SettingsPanel from './components/SettingsPanel'
+import DoctorsPanel from './components/DoctorsPanel'
 // Configuration centralisée
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
@@ -274,6 +276,30 @@ export default function App() {
       />
 
       <main className="main-content">
+        {/* Hospital & Department Header Bar */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '12px 24px', marginBottom: '8px',
+          background: 'hsla(var(--color-primary)/0.06)',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid hsla(var(--color-primary)/0.1)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.9rem', color: 'hsl(var(--text-secondary))' }}>
+            <span style={{ fontWeight: '600', color: 'hsl(var(--text-primary))' }}>
+              {currentUser?.hospital_id || 'Hôpital'}
+            </span>
+            {currentUser?.department && (
+              <>
+                <span style={{ color: 'hsl(var(--text-muted))' }}>•</span>
+                <span style={{ color: 'hsl(var(--color-primary))' }}>{currentUser.department}</span>
+              </>
+            )}
+          </div>
+          <span style={{ fontSize: '0.8rem', color: 'hsl(var(--text-muted))' }}>
+            {currentUser?.fullName} — {currentUser?.role}
+          </span>
+        </div>
+
         {error && (
           <div className="error-banner" id="error-banner">
             <AlertCircle size={18} />
@@ -344,6 +370,12 @@ export default function App() {
         {activeTab === 'history' && <HistoryPanel user={currentUser} />}
 
         {activeTab === 'stats' && <StatsPanel user={currentUser} />}
+
+        {activeTab === 'settings' && <SettingsPanel user={currentUser} />}
+
+        {activeTab === 'doctors' && currentUser?.role === 'Agent Médical' && (
+          <DoctorsPanel user={currentUser} />
+        )}
       </main>
 
       {/* Success Toast */}
