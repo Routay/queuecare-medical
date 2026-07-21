@@ -3,6 +3,9 @@ import { Users, UserCheck, Clock, Wifi } from 'lucide-react'
 export default function StatCards({ departments, connectedCount }) {
   const totalWaiting = departments.reduce((sum, d) => sum + d.waitingCount, 0)
   const activeDepts = departments.filter(d => d.waitingCount > 0).length
+  const avgWait = totalWaiting > 0
+    ? Math.round(totalWaiting * 15 / Math.max(activeDepts, 1))
+    : 0
 
   return (
     <div className="stats-grid">
@@ -31,7 +34,7 @@ export default function StatCards({ departments, connectedCount }) {
           <Clock size={20} />
         </div>
         <div className="stat-content">
-          <div className="stat-value">{totalWaiting > 0 ? `${Math.round(totalWaiting * 15 / Math.max(activeDepts, 1))}m` : '0m'}</div>
+          <div className="stat-value">{avgWait > 0 ? `${avgWait}m` : '0m'}</div>
           <div className="stat-label">Attente moy.</div>
         </div>
       </div>
@@ -41,8 +44,8 @@ export default function StatCards({ departments, connectedCount }) {
           <Wifi size={20} />
         </div>
         <div className="stat-content">
-          <div className="stat-value">{departments.length}</div>
-          <div className="stat-label">Départements</div>
+          <div className="stat-value">{connectedCount ?? 0}</div>
+          <div className="stat-label">Connectés</div>
         </div>
       </div>
     </div>

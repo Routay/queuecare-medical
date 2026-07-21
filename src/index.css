@@ -299,10 +299,9 @@ body::after {
    ═══════════════════════════════════════ */
 
 .dashboard-layout {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
-  align-items: start;
 }
 
 .main-column {
@@ -1951,4 +1950,381 @@ body::after {
   font-size: 0.9rem;
   border-top: 1px solid hsl(var(--border-color));
 }
+
+/* ═══════════════════════════════════════
+   Appointments Panel
+   ═══════════════════════════════════════ */
+
+.appt-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .appt-grid { grid-template-columns: 1fr; }
+}
+
+.appt-form {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 100px;
+}
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: hsl(var(--text-muted));
+  letter-spacing: 0.03em;
+}
+
+.form-input {
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid hsl(var(--border-color));
+  background: hsl(var(--bg-secondary));
+  color: hsl(var(--text-primary));
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: hsl(var(--color-accent));
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+/* Availability slots */
+.avail-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid hsl(var(--border-color));
+  transition: background 0.15s;
+}
+
+.avail-slot.free {
+  background: hsl(160 84% 50% / 0.06);
+  border-color: hsl(160 84% 50% / 0.25);
+}
+
+.avail-slot.booked {
+  background: hsl(var(--bg-tertiary));
+  opacity: 0.7;
+}
+
+.avail-date {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: hsl(var(--text-primary));
+}
+
+.avail-time {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  color: hsl(var(--text-muted));
+  margin-top: 4px;
+}
+
+.slot-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.slot-badge.booked {
+  background: hsl(var(--bg-tertiary));
+  color: hsl(var(--text-muted));
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.icon-btn.danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.icon-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* Badge variants */
+.badge.warning { background: hsl(38 92% 50% / 0.15); color: hsl(var(--color-warning)); }
+.badge.success { background: hsl(160 84% 39% / 0.15); color: hsl(160 84% 39%); }
+
+/* Appointment cards */
+.appt-card {
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid hsl(var(--border-color));
+  background: hsl(var(--bg-secondary));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s;
+}
+
+.appt-card.pending { border-left: 4px solid hsl(38 92% 50%); }
+.appt-card.confirmed { flex-direction: row; align-items: center; border-left: 4px solid hsl(160 84% 39%); }
+
+.appt-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.appt-patient {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: hsl(var(--text-primary));
+}
+
+.appt-datetime {
+  font-size: 0.82rem;
+  color: hsl(160 84% 39%);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.appt-phone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: hsl(var(--text-muted));
+}
+
+.appt-reason {
+  font-size: 0.82rem;
+  color: hsl(var(--text-muted));
+  padding: 6px 10px;
+  background: hsl(var(--bg-tertiary));
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+.appt-btn {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: opacity 0.15s;
+}
+
+.appt-btn:hover { opacity: 0.85; }
+.appt-btn.confirm { background: hsl(160 84% 39% / 0.15); color: hsl(160 84% 39%); border: 1px solid hsl(160 84% 39% / 0.3); }
+.appt-btn.cancel  { background: hsl(0 84% 60% / 0.1); color: #ef4444; border: 1px solid hsl(0 84% 60% / 0.25); }
+
+/* ---------------------------------------
+   Welcome Screen Overlay
+   --------------------------------------- */
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  background: hsl(var(--bg-primary));
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeOutWelcome 0.5s ease-out 1.5s forwards;
+}
+
+.welcome-content {
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.welcome-title {
+  font-size: 2.5rem;
+  color: hsl(var(--text-primary));
+  margin-bottom: 10px;
+}
+
+.welcome-subtitle {
+  font-size: 1.2rem;
+  color: hsl(var(--color-primary));
+  margin-bottom: 30px;
+}
+
+.welcome-spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  border: 3px solid hsla(var(--color-primary), 0.2);
+  border-top-color: hsl(var(--color-primary));
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes fadeOutWelcome {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* ---------------------------------------
+   Timetable Styles (Emploi du temps)
+   --------------------------------------- */
+.timetable-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.timetable-day-card {
+  background: hsl(var(--bg-elevated));
+  border: 1px solid hsl(var(--border-glass));
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.timetable-day-header {
+  background: hsl(var(--bg-glass));
+  padding: 16px 24px;
+  border-bottom: 1px solid hsl(var(--border-glass));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.timetable-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 24px;
+}
+
+.timetable-slot {
+  background: hsl(var(--bg-primary));
+  border: 1px solid hsl(var(--border-glass));
+  border-radius: var(--radius-md);
+  padding: 16px;
+  position: relative;
+  transition: var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.timetable-slot:hover {
+  border-color: hsl(var(--color-primary-light));
+  transform: translateY(-2px);
+}
+
+.timetable-slot.status-free {
+  border-left: 4px solid hsl(var(--color-accent));
+}
+
+.timetable-slot.status-pending {
+  border-left: 4px solid hsl(var(--color-warning));
+}
+
+.timetable-slot.status-confirmed {
+  border-left: 4px solid hsl(var(--color-primary));
+}
+
+.slot-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: hsl(var(--text-secondary));
+  font-size: 0.9rem;
+}
+
+.slot-details {
+  flex: 1;
+}
+
+.slot-patient {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: hsl(var(--text-primary));
+}
+
+.slot-phone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: hsl(var(--text-muted));
+  margin-top: 4px;
+}
+
+.slot-reason {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: hsl(var(--text-secondary));
+  background: hsl(var(--bg-secondary));
+  padding: 8px;
+  border-radius: var(--radius-sm);
+}
+
+.slot-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.slot-actions button {
+  flex: 1;
+  padding: 8px;
+  font-size: 0.85rem;
+}
+
+.slot-badge-top {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-free { background: hsla(160, 84%, 40%, 0.1); color: hsl(160, 84%, 55%); }
+.badge-pending { background: hsla(38, 92%, 50%, 0.1); color: hsl(38, 92%, 50%); }
+.badge-confirmed { background: hsla(217, 91%, 60%, 0.1); color: hsl(217, 91%, 72%); }
 

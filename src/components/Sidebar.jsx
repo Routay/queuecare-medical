@@ -56,14 +56,7 @@ export default function Sidebar({ activeTab, onTabChange, user, onLogout }) {
           <BarChart3 size={18} />
           <span>Statistiques</span>
         </button>
-        <button
-          id="nav-hospitals"
-          className={`nav-item ${activeTab === 'hospitals' ? 'active' : ''}`}
-          onClick={() => onTabChange('hospitals')}
-        >
-          <Building2 size={18} />
-          <span>Hôpitaux</span>
-        </button>
+
       </nav>
 
       <div className="sidebar-footer">

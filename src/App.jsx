@@ -9,8 +9,6 @@ import HistoryPanel from './components/HistoryPanel'
 import StatsPanel from './components/StatsPanel'
 import ConsultationModal from './components/ConsultationModal'
 import AppointmentsPanel from './components/AppointmentsPanel'
-import HospitalsPanel from './components/HospitalsPanel'
-
 // Configuration centralisée
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
@@ -36,6 +34,7 @@ export default function App() {
   const [error, setError] = useState(null)
   const [toast, setToast] = useState(null)
   const [activeConsultation, setActiveConsultation] = useState(null)
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false)
 
   // ═══════════════════════════════
   //  Auth handlers
@@ -44,6 +43,10 @@ export default function App() {
     setAuthToken(token)
     setCurrentUser(user)
     setIsAuthenticated(true)
+    setShowWelcomeScreen(true)
+    setTimeout(() => {
+      setShowWelcomeScreen(false)
+    }, 2000)
   }
 
   const handleLogout = async () => {
@@ -341,8 +344,6 @@ export default function App() {
         {activeTab === 'history' && <HistoryPanel user={currentUser} />}
 
         {activeTab === 'stats' && <StatsPanel user={currentUser} />}
-
-        {activeTab === 'hospitals' && <HospitalsPanel />}
       </main>
 
       {/* Success Toast */}
@@ -360,6 +361,17 @@ export default function App() {
           onClose={() => setActiveConsultation(null)}
           onComplete={handleCompleteConsultation}
         />
+      )}
+
+      {/* Welcome Screen Overlay */}
+      {showWelcomeScreen && (
+        <div className="welcome-overlay">
+          <div className="welcome-content">
+            <h1 className="welcome-title">Bienvenue, {currentUser?.fullName}</h1>
+            <p className="welcome-subtitle">{currentUser?.hospital_id || 'Hôpital'}</p>
+            <div className="welcome-spinner"></div>
+          </div>
+        </div>
       )}
     </>
   )
