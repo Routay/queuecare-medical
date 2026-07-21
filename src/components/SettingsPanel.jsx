@@ -7,13 +7,24 @@ export default function SettingsPanel({ user }) {
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [resetSent, setResetSent] = useState(false)
 
-  const [formData, setFormData] = useState({
-    fullName: user?.fullName || '',
-    email: user?.email || 'medecin@queuecare.sn',
-    phone: user?.phone || '+221 77 000 00 00',
-    specialty: user?.department || 'Non défini',
-    notifications: true,
-    emailAlerts: false
+  const loadSavedSettings = () => {
+    try {
+      const saved = localStorage.getItem('queuecare_medical_settings')
+      if (saved) return JSON.parse(saved)
+    } catch {}
+    return null
+  }
+
+  const [formData, setFormData] = useState(() => {
+    const saved = loadSavedSettings()
+    return saved || {
+      fullName: user?.fullName || '',
+      email: user?.email || 'medecin@queuecare.sn',
+      phone: user?.phone || '+221 77 000 00 00',
+      specialty: user?.department || 'Non défini',
+      notifications: true,
+      emailAlerts: false
+    }
   })
 
   const [passwordData, setPasswordData] = useState({
@@ -26,6 +37,8 @@ export default function SettingsPanel({ user }) {
 
   const handleSave = (e) => {
     e.preventDefault()
+    // Persist settings to localStorage
+    localStorage.setItem('queuecare_medical_settings', JSON.stringify(formData))
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
   }
