@@ -51,7 +51,7 @@ export default function App() {
       const res = await fetch(`${API_URL}/hospitals/`)
       if (res.ok) {
         const data = await res.json()
-        const h = data.find(h => h.id === user.hospital_id)
+        const h = data.data.find(h => h.id === user.hospital_id)
         if (h) setHospitalName(h.name)
       }
     } catch (e) {
