@@ -3,23 +3,15 @@ import { BarChart3, Users, Clock, TrendingUp, Activity, Zap, RefreshCw } from 'l
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
-export default function StatsPanel({ user }) {
+export default function StatsPanel({ user, hospitalName }) {
   const [stats, setStats] = useState(null)
-  const [hospitalName, setHospitalName] = useState('')
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchStats = useCallback(async () => {
     try {
       if (!user?.hospital_id) return;
       setIsLoading(true)
-      
-      // Fetch Hospital details for the title
-      const hospRes = await fetch(`${API_URL}/hospitals/${user.hospital_id}`)
-      if (hospRes.ok) {
-        const hospData = await hospRes.json()
-        setHospitalName(hospData.data.name)
-      }
-
+      // Fetch stats
       const res = await fetch(`${API_URL}/queue/statistics/overview?hospital_id=${user.hospital_id}`)
       if (!res.ok) throw new Error('Erreur serveur')
       const data = await res.json()
@@ -30,7 +22,9 @@ export default function StatsPanel({ user }) {
       if (!data.totalWaiting && data.totalWaiting !== 0) data.totalWaiting = 0;
       if (!data.averageWaitMinutes && data.averageWaitMinutes !== 0) data.averageWaitMinutes = 0;
       if (!data.busiestDepartment) data.busiestDepartment = 'Aucun';
-      if (!data.departmentStats) data.departmentStats = [];
+      if (!Array.isArray(data.departmentStats)) {
+        data.departmentStats = Object.values(data.departmentStats || {});
+      }
 
       setStats(data)
     } catch (err) {

@@ -383,7 +383,7 @@ export default function App() {
 
         {activeTab === 'history' && <HistoryPanel user={currentUser} />}
 
-        {activeTab === 'stats' && <StatsPanel user={currentUser} />}
+        {activeTab === 'stats' && <StatsPanel user={currentUser} hospitalName={hospitalName} />}
 
         {activeTab === 'settings' && <SettingsPanel user={currentUser} />}
 
