@@ -1,4 +1,4 @@
-import { Stethoscope, LayoutDashboard, Pill, Clock, BarChart3, LogOut, CalendarDays, Settings, Users, Building2 } from 'lucide-react'
+import { Stethoscope, LayoutDashboard, Pill, Clock, BarChart3, LogOut, CalendarDays, Settings, Users, Building2, Shield } from 'lucide-react'
 
 export default function Sidebar({ activeTab, onTabChange, user, hospitalName, onLogout }) {
   return (
