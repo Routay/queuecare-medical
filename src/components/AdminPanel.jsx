@@ -143,15 +143,15 @@ export default function AdminPanel({ user, showToast, setError }) {
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', borderBottom: '1px solid hsl(var(--border-color))', paddingBottom: '16px' }}>
-        <button onClick={() => { setActiveTab('hospitals'); setShowForm(false); }} className={`btn ${activeTab === 'hospitals' ? 'btn-primary' : 'btn-secondary'}`}>
-          <Building2 size={16} style={{ marginRight: 8 }}/> Hôpitaux
+      <div className="department-tabs">
+        <button onClick={() => { setActiveTab('hospitals'); setShowForm(false); }} className={`dept-tab ${activeTab === 'hospitals' ? 'active' : ''}`}>
+          <Building2 size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom' }}/> Hôpitaux
         </button>
-        <button onClick={() => { setActiveTab('pharmacies'); setShowForm(false); }} className={`btn ${activeTab === 'pharmacies' ? 'btn-primary' : 'btn-secondary'}`}>
-          <Pill size={16} style={{ marginRight: 8 }}/> Pharmacies
+        <button onClick={() => { setActiveTab('pharmacies'); setShowForm(false); }} className={`dept-tab ${activeTab === 'pharmacies' ? 'active' : ''}`}>
+          <Pill size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom' }}/> Pharmacies
         </button>
-        <button onClick={() => { setActiveTab('agents'); setShowForm(false); }} className={`btn ${activeTab === 'agents' ? 'btn-primary' : 'btn-secondary'}`}>
-          <Users size={16} style={{ marginRight: 8 }}/> Agents Médicaux
+        <button onClick={() => { setActiveTab('agents'); setShowForm(false); }} className={`dept-tab ${activeTab === 'agents' ? 'active' : ''}`}>
+          <Users size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom' }}/> Agents Médicaux
         </button>
       </div>
 
