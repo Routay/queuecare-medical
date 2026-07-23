@@ -3,9 +3,7 @@ import { Building2, Pill, Users, Plus, Trash2, Shield } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
-export default function AdminPanel({ user, showToast, setError }) {
-  const [activeTab, setActiveTab] = useState('hospitals');
-  
+export default function AdminPanel({ user, showToast, setError, activeTab }) {
   // States
   const [hospitals, setHospitals] = useState([]);
   const [pharmacies, setPharmacies] = useState([]);
@@ -22,6 +20,10 @@ export default function AdminPanel({ user, showToast, setError }) {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    setShowForm(false);
+  }, [activeTab]);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -140,18 +142,6 @@ export default function AdminPanel({ user, showToast, setError }) {
         </div>
         <button className="call-next-btn" onClick={() => setShowForm(!showForm)}>
           <Plus size={16} /> {showForm ? 'Annuler' : 'Ajouter'}
-        </button>
-      </div>
-
-      <div className="department-tabs">
-        <button onClick={() => { setActiveTab('hospitals'); setShowForm(false); }} className={`dept-tab ${activeTab === 'hospitals' ? 'active' : ''}`}>
-          <Building2 size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom' }}/> Hôpitaux
-        </button>
-        <button onClick={() => { setActiveTab('pharmacies'); setShowForm(false); }} className={`dept-tab ${activeTab === 'pharmacies' ? 'active' : ''}`}>
-          <Pill size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom' }}/> Pharmacies
-        </button>
-        <button onClick={() => { setActiveTab('agents'); setShowForm(false); }} className={`dept-tab ${activeTab === 'agents' ? 'active' : ''}`}>
-          <Users size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom' }}/> Agents Médicaux
         </button>
       </div>
 

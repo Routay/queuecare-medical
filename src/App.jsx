@@ -50,7 +50,7 @@ export default function App() {
     setIsAuthenticated(true)
     
     if (user.role === 'Admin') {
-      setActiveTab('admin')
+      setActiveTab('admin-hospitals')
     } else {
       setActiveTab('queue')
     }
@@ -404,8 +404,8 @@ export default function App() {
           <DoctorsPanel user={currentUser} />
         )}
 
-        {activeTab === 'admin' && currentUser?.role === 'Admin' && (
-          <AdminPanel user={currentUser} showToast={showToast} setError={setError} />
+        {activeTab.startsWith('admin-') && currentUser?.role === 'Admin' && (
+          <AdminPanel user={currentUser} showToast={showToast} setError={setError} activeTab={activeTab.replace('admin-', '')} />
         )}
       </main>
 

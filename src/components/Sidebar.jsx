@@ -73,14 +73,35 @@ export default function Sidebar({ activeTab, onTabChange, user, hospitalName, on
           </button>
         )}
         {user?.role === 'Admin' && (
-          <button
-            id="nav-admin"
-            className={`nav-item ${activeTab === 'admin' ? 'active' : ''}`}
-            onClick={() => onTabChange('admin')}
-          >
-            <Shield size={18} />
-            <span>Administration</span>
-          </button>
+          <>
+            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'hsl(var(--text-muted))', margin: '1rem 0 0.5rem 1rem', fontWeight: 600, letterSpacing: '0.05em' }}>
+              Administration
+            </div>
+            <button
+              id="nav-admin-hospitals"
+              className={`nav-item ${activeTab === 'admin-hospitals' ? 'active' : ''}`}
+              onClick={() => onTabChange('admin-hospitals')}
+            >
+              <Building2 size={18} />
+              <span>Hôpitaux</span>
+            </button>
+            <button
+              id="nav-admin-pharmacies"
+              className={`nav-item ${activeTab === 'admin-pharmacies' ? 'active' : ''}`}
+              onClick={() => onTabChange('admin-pharmacies')}
+            >
+              <Pill size={18} />
+              <span>Pharmacies</span>
+            </button>
+            <button
+              id="nav-admin-agents"
+              className={`nav-item ${activeTab === 'admin-agents' ? 'active' : ''}`}
+              onClick={() => onTabChange('admin-agents')}
+            >
+              <Users size={18} />
+              <span>Agents Médicaux</span>
+            </button>
+          </>
         )}
         <button
           id="nav-settings"
