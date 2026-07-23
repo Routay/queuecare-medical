@@ -2328,3 +2328,23 @@ body::after {
 .badge-pending { background: hsla(38, 92%, 50%, 0.1); color: hsl(38, 92%, 50%); }
 .badge-confirmed { background: hsla(217, 91%, 60%, 0.1); color: hsl(217, 91%, 72%); }
 
+/* ─── Animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); max-height: 0; }
+  to { opacity: 1; transform: translateY(0); max-height: 600px; }
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
