@@ -75,7 +75,7 @@ export default function SettingsPanel({ user }) {
   const sections = [
     { id: 'profile', label: 'Mon Profil', icon: User },
     { id: 'security', label: 'Sécurité', icon: Shield },
-    { id: 'notifications', label: 'Notifications', icon: Bell }
+    ...(user?.role !== 'Admin' ? [{ id: 'notifications', label: 'Notifications', icon: Bell }] : [])
   ]
 
   return (

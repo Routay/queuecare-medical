@@ -12,6 +12,7 @@ export default function AdminPanel({ user, showToast, setError, activeTab }) {
 
   // Forms
   const [showForm, setShowForm] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   
   const [hospForm, setHospForm] = useState({ name: '', address: '' });
   const [pharmForm, setPharmForm] = useState({ name: '', address: '' });
@@ -44,8 +45,14 @@ export default function AdminPanel({ user, showToast, setError, activeTab }) {
     }
   };
 
-  const handleDelete = async (type, id) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cet élément ?")) return;
+  const handleDelete = (type, id) => {
+    setItemToDelete({ type, id });
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+    const { type, id } = itemToDelete;
+    setItemToDelete(null);
     try {
       let endpoint = '';
       if (type === 'hospital') endpoint = `/hospitals/${id}`;
@@ -262,6 +269,30 @@ export default function AdminPanel({ user, showToast, setError, activeTab }) {
           </table>
         )}
       </div>
+
+      {itemToDelete && (
+        <div className="modal-overlay" onClick={() => setItemToDelete(null)}>
+          <div className="modal-content glass-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', textAlign: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Trash2 size={28} color="#ef4444" />
+              </div>
+            </div>
+            <h3 style={{ marginBottom: '12px', fontSize: '1.25rem' }}>Confirmer la suppression</h3>
+            <p style={{ color: 'hsl(var(--text-muted))', marginBottom: '24px', lineHeight: 1.5 }}>
+              Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button className="btn btn-secondary" onClick={() => setItemToDelete(null)} style={{ flex: 1 }}>
+                Annuler
+              </button>
+              <button className="btn btn-danger" onClick={confirmDelete} style={{ flex: 1 }}>
+                Oui, supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
