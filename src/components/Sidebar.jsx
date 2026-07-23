@@ -12,23 +12,27 @@ export default function Sidebar({ activeTab, onTabChange, user, hospitalName, on
       </div>
 
       <nav className="sidebar-nav">
-        <button
-          id="nav-queue"
-          className={`nav-item ${activeTab === 'queue' ? 'active' : ''}`}
-          onClick={() => onTabChange('queue')}
-        >
-          <LayoutDashboard size={18} />
-          <span>File d'Attente</span>
-        </button>
-        <button
-          id="nav-pharmacies"
-          className={`nav-item ${activeTab === 'pharmacies' ? 'active' : ''}`}
-          onClick={() => onTabChange('pharmacies')}
-        >
-          <Pill size={18} />
-          <span>Pharmacies</span>
-        </button>
-        {user?.role !== 'Agent Médical' && (
+        {user?.role !== 'Admin' && (
+          <>
+            <button
+              id="nav-queue"
+              className={`nav-item ${activeTab === 'queue' ? 'active' : ''}`}
+              onClick={() => onTabChange('queue')}
+            >
+              <LayoutDashboard size={18} />
+              <span>File d'Attente</span>
+            </button>
+            <button
+              id="nav-pharmacies"
+              className={`nav-item ${activeTab === 'pharmacies' ? 'active' : ''}`}
+              onClick={() => onTabChange('pharmacies')}
+            >
+              <Pill size={18} />
+              <span>Pharmacies</span>
+            </button>
+          </>
+        )}
+        {user?.role !== 'Agent Médical' && user?.role !== 'Admin' && (
           <>
             <button
               id="nav-appointments"
@@ -58,14 +62,16 @@ export default function Sidebar({ activeTab, onTabChange, user, hospitalName, on
             <span>Médecins</span>
           </button>
         )}
-        <button
-          id="nav-stats"
-          className={`nav-item ${activeTab === 'stats' ? 'active' : ''}`}
-          onClick={() => onTabChange('stats')}
-        >
-          <BarChart3 size={18} />
-          <span>Statistiques</span>
-        </button>
+        {user?.role !== 'Admin' && (
+          <button
+            id="nav-stats"
+            className={`nav-item ${activeTab === 'stats' ? 'active' : ''}`}
+            onClick={() => onTabChange('stats')}
+          >
+            <BarChart3 size={18} />
+            <span>Statistiques</span>
+          </button>
+        )}
         {user?.role === 'Admin' && (
           <button
             id="nav-admin"

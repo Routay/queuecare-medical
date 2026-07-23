@@ -49,6 +49,12 @@ export default function App() {
     setCurrentUser(user)
     setIsAuthenticated(true)
     
+    if (user.role === 'Admin') {
+      setActiveTab('admin')
+    } else {
+      setActiveTab('queue')
+    }
+    
     try {
       const res = await fetch(`${API_URL}/hospitals/`)
       if (res.ok) {
