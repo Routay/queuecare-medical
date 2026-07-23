@@ -66,6 +66,16 @@ export default function Sidebar({ activeTab, onTabChange, user, hospitalName, on
           <BarChart3 size={18} />
           <span>Statistiques</span>
         </button>
+        {user?.role === 'Admin' && (
+          <button
+            id="nav-admin"
+            className={`nav-item ${activeTab === 'admin' ? 'active' : ''}`}
+            onClick={() => onTabChange('admin')}
+          >
+            <Shield size={18} />
+            <span>Administration</span>
+          </button>
+        )}
         <button
           id="nav-settings"
           className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}

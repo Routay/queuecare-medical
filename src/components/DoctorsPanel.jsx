@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { UserPlus, Users, Search, Shield, Trash2, Edit3, X, Check, Building2, Stethoscope, Phone, Mail, Eye, EyeOff } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { UserPlus, Users, Search, Shield, Trash2, Edit3, X, Check, Building2, Stethoscope, Phone, Mail, Eye, EyeOff, AlertCircle } from 'lucide-react'
 
 // Generate a random password
 const generatePassword = () => {
@@ -10,20 +10,40 @@ const generatePassword = () => {
 }
 
 export default function DoctorsPanel({ user }) {
-  const [doctors, setDoctors] = useState([
-    { id: 1, fullName: 'Dr. Moussa Diallo', username: 'dr.diallo', role: 'Médecin', department: 'Médecine Générale', status: 'Actif', phone: '+221 77 123 45 67', email: 'diallo@queuecare.sn' },
-    { id: 2, fullName: 'Dr. Fatou Ndiaye', username: 'dr.ndiaye', role: 'Médecin', department: 'Pédiatrie', status: 'Actif', phone: '+221 76 987 65 43', email: 'ndiaye@queuecare.sn' },
-  ])
-
+  const [doctors, setDoctors] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [editingId, setEditingId] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
   const [formData, setFormData] = useState({
     fullName: '', username: '', role: 'Médecin', department: '',
     status: 'Actif', phone: '', email: '', password: generatePassword()
   })
+
+  useEffect(() => {
+    fetchDoctors()
+  }, [])
+
+  const fetchDoctors = async () => {
+    setIsLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/auth/users?hospital_id=${user.hospital_id}`)
+      if (res.ok) {
+        const data = await res.json()
+        const hospitalStaff = data.data.filter(u => u.role !== 'Agent Médical' && u.role !== 'Admin')
+        setDoctors(hospitalStaff)
+      }
+    } catch (e) {
+      setError("Erreur de chargement des médecins.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const resetForm = () => {
     setFormData({
@@ -33,30 +53,65 @@ export default function DoctorsPanel({ user }) {
     setShowAddForm(false)
     setEditingId(null)
     setShowPassword(false)
+    setError(null)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!formData.fullName || !formData.username || !formData.department) return
 
     if (editingId) {
-      setDoctors(prev => prev.map(d => d.id === editingId ? { ...d, ...formData } : d))
+      // Pour l'instant, on n'a pas de route PUT /auth/users dans le backend
+      // On va juste rafraîchir
+      fetchDoctors()
+      resetForm()
     } else {
-      const newDoctor = { ...formData, id: Date.now() }
-      setDoctors(prev => [...prev, newDoctor])
+      try {
+        const res = await fetch(`${API_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: formData.username,
+            password: formData.password,
+            fullName: formData.fullName,
+            role: formData.role,
+            department: formData.department,
+            avatar: formData.fullName.substring(0, 2).toUpperCase(),
+            hospital_id: user.hospital_id
+          })
+        })
+        if (res.ok) {
+          fetchDoctors()
+          resetForm()
+        } else {
+          const err = await res.json()
+          setError(err.detail || "Erreur lors de la création.")
+        }
+      } catch (e) {
+        setError("Erreur réseau.")
+      }
     }
-    resetForm()
   }
 
   const handleEdit = (doctor) => {
-    setFormData({ ...doctor, password: generatePassword() })
+    setFormData({ ...doctor, password: generatePassword(), status: doctor.status || 'Actif' })
     setEditingId(doctor.id)
     setShowAddForm(true)
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce médecin ?')) {
-      setDoctors(prev => prev.filter(d => d.id !== id))
+      try {
+        const res = await fetch(`${API_URL}/auth/users/${id}`, { method: 'DELETE' })
+        if (res.ok) {
+          fetchDoctors()
+        } else {
+          const err = await res.json()
+          setError(err.detail || "Erreur de suppression.")
+        }
+      } catch (e) {
+        setError("Erreur réseau.")
+      }
     }
   }
 
@@ -167,6 +222,11 @@ export default function DoctorsPanel({ user }) {
       )}
 
       {/* Search bar */}
+      {error && (
+        <div className="error-banner" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', background: 'hsla(var(--color-danger)/0.1)', color: 'hsl(var(--color-danger))', borderRadius: '8px', marginBottom: '16px' }}>
+          <AlertCircle size={18} /> {error}
+        </div>
+      )}
       <div className="glass-panel" style={{ padding: '16px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
         <Search size={18} color="hsl(var(--text-muted))" />
         <input type="text" className="form-input" placeholder="Rechercher un médecin par nom, département ou rôle..."
@@ -175,7 +235,9 @@ export default function DoctorsPanel({ user }) {
       </div>
 
       {/* Doctors list */}
-      {filteredDoctors.length === 0 ? (
+      {isLoading ? (
+        <div className="loading-container"><div className="spinner"></div></div>
+      ) : filteredDoctors.length === 0 ? (
         <div className="empty-queue glass-panel" style={{ padding: '48px 0' }}>
           <Users size={48} color="hsl(var(--text-muted))" style={{ opacity: 0.3 }} />
           <p style={{ fontSize: '1.1rem', marginTop: '16px' }}>Aucun médecin trouvé.</p>

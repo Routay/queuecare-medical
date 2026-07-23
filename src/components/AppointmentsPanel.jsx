@@ -245,7 +245,7 @@ export default function AppointmentsPanel({ user, showToast, setError }) {
             <UserPlus size={18} color="hsl(var(--color-primary))" />
             Ajouter un Rendez-vous Physique
           </h3>
-          <form onSubmit={handleAddManualAppointment} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+          <form onSubmit={handleManualSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
             <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label">Nom du patient *</label>
               <input type="text" className="form-input" placeholder="Prénom Nom"

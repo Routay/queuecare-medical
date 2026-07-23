@@ -11,6 +11,7 @@ import ConsultationModal from './components/ConsultationModal'
 import AppointmentsPanel from './components/AppointmentsPanel'
 import SettingsPanel from './components/SettingsPanel'
 import DoctorsPanel from './components/DoctorsPanel'
+import AdminPanel from './components/AdminPanel'
 // Configuration centralisée
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
@@ -395,6 +396,10 @@ export default function App() {
 
         {activeTab === 'doctors' && currentUser?.role === 'Agent Médical' && (
           <DoctorsPanel user={currentUser} />
+        )}
+
+        {activeTab === 'admin' && currentUser?.role === 'Admin' && (
+          <AdminPanel user={currentUser} showToast={showToast} setError={setError} />
         )}
       </main>
 
