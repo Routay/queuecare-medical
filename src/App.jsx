@@ -95,7 +95,7 @@ export default function App() {
   const fetchDepartments = useCallback(async () => {
     if (!currentUser?.hospital_id) return
     try {
-      const res = await fetch(`${API_URL}/queue/${currentUser.hospital_id}/departments/list`)
+      const res = await fetch(`${API_URL}/queue/${currentUser.hospital_id}/departments/list`, { cache: 'no-store' })
       if (!res.ok) throw new Error('Erreur serveur')
       const data = await res.json()
       
@@ -126,7 +126,7 @@ export default function App() {
     if (!dept || !currentUser?.hospital_id) return
     try {
       setIsLoadingQueue(true)
-      const res = await fetch(`${API_URL}/queue/${currentUser.hospital_id}/${encodeURIComponent(dept)}`)
+      const res = await fetch(`${API_URL}/queue/${currentUser.hospital_id}/${encodeURIComponent(dept)}`, { cache: 'no-store' })
       if (!res.ok) throw new Error('Erreur serveur')
       const data = await res.json()
       setPatients(data.patients || [])

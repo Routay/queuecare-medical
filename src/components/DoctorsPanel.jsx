@@ -61,10 +61,31 @@ export default function DoctorsPanel({ user }) {
     if (!formData.fullName || !formData.username || !formData.department) return
 
     if (editingId) {
-      // Pour l'instant, on n'a pas de route PUT /auth/users dans le backend
-      // On va juste rafraîchir
-      fetchDoctors()
-      resetForm()
+      try {
+        const payload = {
+          username: formData.username,
+          fullName: formData.fullName,
+          department: formData.department,
+          hospital_id: user.hospital_id
+        }
+        if (formData.password.trim()) {
+          payload.password = formData.password
+        }
+        const res = await fetch(`${API_URL}/auth/users/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        if (res.ok) {
+          fetchDoctors()
+          resetForm()
+        } else {
+          const err = await res.json()
+          setError(err.detail || "Erreur lors de la modification.")
+        }
+      } catch (e) {
+        setError("Erreur réseau.")
+      }
     } else {
       try {
         const res = await fetch(`${API_URL}/auth/register`, {
